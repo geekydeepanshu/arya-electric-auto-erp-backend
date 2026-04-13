@@ -1,0 +1,41 @@
+# inquiry routes
+
+
+
+1. create a inquiry
+
+POST http://localhost:8080/api/inquiries
+endpoint: http://localhost:8080/api/inquiries?name=Amit&phone=8888888888&city=Delhi&source=VISIT
+
+2. get all inquiries
+
+GET http://localhost:8080/api/inquiries
+http://localhost:8080/api/inquiries
+
+3. get inquiry by id
+
+GET /api/inquiries/{id}
+http://localhost:8080/api/inquiries/1
+
+4. update enquiry status
+
+PUT /api/inquiries/{id}/status
+http://localhost:8080/api/inquiries/1/status?status=FOLLOW_UP
+
+NEW
+FOLLOW_UP
+NEGOTIATION
+CONVERTED
+LOST
+
+
+5. Assign Employee to Inquiry
+
+PUT /api/inquiries/{id}/assign
+http://localhost:8080/api/inquiries/1/assign?employeeId=1
+
+
+6. Delete Inquiry (Soft Delete)
+
+DELETE /api/inquiries/{id}
+http://localhost:8080/api/inquiries/1
