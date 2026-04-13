@@ -1,7 +1,9 @@
 package com.arya_electric_auto.erp.service;
 
+import com.arya_electric_auto.erp.dto.InquiryCreateRequest;
 import com.arya_electric_auto.erp.dto.InquiryResponse;
 import com.arya_electric_auto.erp.entity.*;
+import com.arya_electric_auto.erp.mapper.InquiryMapper;
 import com.arya_electric_auto.erp.repository.InquiryRepository;
 import com.arya_electric_auto.erp.repository.VehicleModelRepository;
 import com.arya_electric_auto.erp.repository.EmployeeRepository;
@@ -34,26 +36,29 @@ public class InquiryService {
     }
 
     // ✅ Create Inquiry
-    public Inquiry create(String name, String phone, String city, String address,
-            InquirySource source, String notes,
-            List<Long> modelIds) {
+    public InquiryResponse create(InquiryCreateRequest request) {
 
-    	Person person = personService.createOrGet(name, phone, city, address);
+    	Person person = personService.createOrGetEntity(
+                request.getName(),
+                request.getPhone(),
+                request.getCity(),
+                request.getAddress()
+        );
 
     	Inquiry inquiry = new Inquiry();
     	inquiry.setPerson(person);
-    	inquiry.setSource(source);
-    	inquiry.setNotes(notes);
+    	inquiry.setSource(request.getSource());
+    	inquiry.setNotes(request.getNotes());
     	inquiry.setStatus(InquiryStatus.NEW);
     	inquiry.setInquiryDate(LocalDateTime.now());
-    	inquiry.setNotes(notes);
+    	inquiry.setNotes(request.getNotes());
     	inquiry.setCreatedAt(LocalDateTime.now());
 
 	// ✅ Save inquiry first
     	Inquiry savedInquiry = inquiryRepository.save(inquiry);
 
 	// ✅ NEW: Save models (IMPORTANT)
-    	for (Long modelId : modelIds) {
+    	for (Long modelId : request.getModelIds()) {
 
     		VehicleModel model = vehicleModelRepository.findById(modelId)
     				.orElseThrow(() -> new RuntimeException("Model not found"));
@@ -66,7 +71,7 @@ public class InquiryService {
     		inquiryModelRepository.save(im);
     	}
 
-    	return savedInquiry;
+    	return toResponse(savedInquiry);
     }
 
     // ✅ Get all
@@ -90,15 +95,15 @@ public class InquiryService {
     
     
     // ✅ Update status
-    public Inquiry updateStatus(Long id, InquiryStatus status) {
+    public InquiryResponse updateStatus(Long id, InquiryStatus status) {
         Inquiry inquiry = getEntityById(id);
         inquiry.setStatus(status);
         inquiry.setUpdatedAt(LocalDateTime.now());
-        return inquiryRepository.save(inquiry);
+        return toResponse(inquiryRepository.save(inquiry));
     }
 
     // ✅ Assign employee
-    public Inquiry assignEmployee(Long inquiryId, Long employeeId) {
+    public InquiryResponse assignEmployee(Long inquiryId, Long employeeId) {
 
         Inquiry inquiry = getEntityById(inquiryId);
 
@@ -107,7 +112,7 @@ public class InquiryService {
 
         inquiry.setHandledBy(employee);
 
-        return inquiryRepository.save(inquiry);
+        return toResponse(inquiryRepository.save(inquiry));
     }
 
     // ✅ Soft delete
@@ -129,18 +134,6 @@ public class InquiryService {
     public InquiryResponse toResponse(Inquiry inquiry) {
 
         List<String> models = getModelsForInquiry(inquiry.getId());
-        System.out.println(inquiry.getPerson().getFullName());
-
-        return new InquiryResponse(
-                inquiry.getId(),
-                inquiry.getPerson().getFullName(),
-                inquiry.getPerson().getPhone(),
-                inquiry.getPerson().getAddress(),
-                inquiry.getPerson().getCity(),
-                inquiry.getSource().name(),
-                inquiry.getStatus().name(),
-                inquiry.getInquiryDate(),
-                models
-        );
+        return InquiryMapper.toResponse(inquiry, models);
     }
 }

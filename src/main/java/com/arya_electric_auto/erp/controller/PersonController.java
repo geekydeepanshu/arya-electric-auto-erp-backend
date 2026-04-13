@@ -1,6 +1,7 @@
 package com.arya_electric_auto.erp.controller;
 
-import com.arya_electric_auto.erp.entity.Person;
+import com.arya_electric_auto.erp.dto.PersonRequest;
+import com.arya_electric_auto.erp.dto.PersonResponse;
 import com.arya_electric_auto.erp.service.PersonService;
 
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +19,7 @@ public class PersonController {
     }
 
     @PostMapping
-    public Person create(@RequestParam String name,
-                         @RequestParam String phone,
-                         @RequestParam String city,
-                         @RequestParam String address) {
-
-        return personService.createOrGet(name, phone, city, address);
+    public PersonResponse create(@RequestBody PersonRequest request) {
+        return personService.createOrGet(request);
     }
 }

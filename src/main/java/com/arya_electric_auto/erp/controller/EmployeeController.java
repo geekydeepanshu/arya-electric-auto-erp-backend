@@ -1,7 +1,7 @@
 package com.arya_electric_auto.erp.controller;
 
+import com.arya_electric_auto.erp.dto.EmployeeRequest;
 import com.arya_electric_auto.erp.dto.EmployeeResponse;
-import com.arya_electric_auto.erp.entity.Employee;
 import com.arya_electric_auto.erp.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +19,8 @@ public class EmployeeController {
 
     // ✅ Create Employee
     @PostMapping
-    public Employee create(@RequestBody Employee employee) {
-        return employeeService.create(employee);
+    public EmployeeResponse create(@RequestBody EmployeeRequest request) {
+        return employeeService.create(request);
     }
 
     // ✅ Get All Employees
@@ -37,9 +37,9 @@ public class EmployeeController {
 
     // ✅ Update Employee
     @PutMapping("/{id}")
-    public Employee update(@PathVariable Long id,
-                           @RequestBody Employee employee) {
-        return employeeService.update(id, employee);
+    public EmployeeResponse update(@PathVariable Long id,
+                           @RequestBody EmployeeRequest request) {
+        return employeeService.update(id, request);
     }
 
     // ✅ Deactivate Employee

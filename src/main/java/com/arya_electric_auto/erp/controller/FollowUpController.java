@@ -1,13 +1,11 @@
 package com.arya_electric_auto.erp.controller;
 
+import com.arya_electric_auto.erp.dto.FollowUpCreateRequest;
 import com.arya_electric_auto.erp.dto.FollowUpResponse;
-import com.arya_electric_auto.erp.entity.FollowUp;
 import com.arya_electric_auto.erp.entity.FollowUpStatus;
 import com.arya_electric_auto.erp.service.FollowUpService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -22,14 +20,8 @@ public class FollowUpController {
 
     // ✅ Create follow-up
     @PostMapping
-    public FollowUp create(@RequestParam Long inquiryId,
-                           @RequestParam Long employeeId,
-                           @RequestParam String notes,
-                           @RequestParam(required = false) FollowUpStatus status,
-                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                            LocalDateTime nextDate) {
-
-        return followUpService.create(inquiryId, employeeId, notes, nextDate, status);
+    public FollowUpResponse create(@RequestBody FollowUpCreateRequest request) {
+        return followUpService.create(request);
     }
     
     

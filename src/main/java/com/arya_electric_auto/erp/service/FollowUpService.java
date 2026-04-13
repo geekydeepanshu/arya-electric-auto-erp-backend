@@ -1,5 +1,6 @@
 package com.arya_electric_auto.erp.service;
 
+import com.arya_electric_auto.erp.dto.FollowUpCreateRequest;
 import com.arya_electric_auto.erp.dto.FollowUpResponse;
 import com.arya_electric_auto.erp.entity.*;
 import com.arya_electric_auto.erp.repository.FollowUpRepository;
@@ -27,10 +28,9 @@ public class FollowUpService {
     }
 
     // ✅ Create follow-up
-    public FollowUp create(Long inquiryId, Long employeeId,
-                           String notes, LocalDateTime nextDate, FollowUpStatus status) {
+    public FollowUpResponse create(FollowUpCreateRequest request) {
 
-        Inquiry inquiry = inquiryService.getEntityById(inquiryId);
+        Inquiry inquiry = inquiryService.getEntityById(request.getInquiryId());
 
         /*
         Employee employee = employeeRepository.findById(employeeId)
@@ -39,15 +39,15 @@ public class FollowUpService {
 
         FollowUp followUp = new FollowUp();
         followUp.setInquiry(inquiry);
-        followUp.setEmployeeId(employeeId);
-        followUp.setNotes(notes);
+        followUp.setEmployeeId(request.getEmployeeId());
+        followUp.setNotes(request.getNotes());
         followUp.setStatus(
-        	    status != null ? status : FollowUpStatus.PENDING
+        	    request.getStatus() != null ? request.getStatus() : FollowUpStatus.PENDING
         	);
-        followUp.setNextFollowUpDate(nextDate);
+        followUp.setNextFollowUpDate(request.getNextDate());
         followUp.setCreatedAt(LocalDateTime.now());
 
-        return followUpRepository.save(followUp);
+        return toResponse(followUpRepository.save(followUp));
     }
     
     

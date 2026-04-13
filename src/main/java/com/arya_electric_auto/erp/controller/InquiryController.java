@@ -1,9 +1,9 @@
 package com.arya_electric_auto.erp.controller;
 
+import com.arya_electric_auto.erp.dto.InquiryAssignRequest;
+import com.arya_electric_auto.erp.dto.InquiryCreateRequest;
 import com.arya_electric_auto.erp.dto.InquiryResponse;
-import com.arya_electric_auto.erp.entity.Inquiry;
-import com.arya_electric_auto.erp.entity.InquirySource;
-import com.arya_electric_auto.erp.entity.InquiryStatus;
+import com.arya_electric_auto.erp.dto.InquiryStatusUpdateRequest;
 import com.arya_electric_auto.erp.service.InquiryService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,24 +21,16 @@ public class InquiryController {
 
     // ✅ Create Inquiry
     @PostMapping
-    public Inquiry create(@RequestParam String name,
-                          @RequestParam String phone,
-                          @RequestParam String city,
-                          @RequestParam String address,
-                          @RequestParam InquirySource source,
-                          @RequestParam List<Long> modelIds,
-                          @RequestParam(required = false) String notes) {
-
-        return inquiryService.create(name, phone, city,address, source, notes, modelIds);
+    public InquiryResponse create(@RequestBody InquiryCreateRequest request) {
+        return inquiryService.create(request);
     }
 
     // ✅ Get all
     @GetMapping
     public List<InquiryResponse> getAll() {
-
         return inquiryService.getAll()
                 .stream()
-                .map((Inquiry inquiry) -> inquiryService.toResponse(inquiry))
+                .map(inquiryService::toResponse)
                 .toList();
     }
     
@@ -50,16 +42,16 @@ public class InquiryController {
 
     // ✅ Update status
     @PutMapping("/{id}/status")
-    public Inquiry updateStatus(@PathVariable Long id,
-                                @RequestParam InquiryStatus status) {
-        return inquiryService.updateStatus(id, status);
+    public InquiryResponse updateStatus(@PathVariable Long id,
+                                @RequestBody InquiryStatusUpdateRequest request) {
+        return inquiryService.updateStatus(id, request.getStatus());
     }
 
     // ✅ Assign employee
     @PutMapping("/{id}/assign")
-    public Inquiry assign(@PathVariable Long id,
-                          @RequestParam Long employeeId) {
-        return inquiryService.assignEmployee(id, employeeId);
+    public InquiryResponse assign(@PathVariable Long id,
+                          @RequestBody InquiryAssignRequest request) {
+        return inquiryService.assignEmployee(id, request.getEmployeeId());
     }
 
     // ✅ Soft delete

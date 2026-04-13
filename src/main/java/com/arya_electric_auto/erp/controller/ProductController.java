@@ -1,6 +1,8 @@
 package com.arya_electric_auto.erp.controller;
 
+import com.arya_electric_auto.erp.dto.ProductResponse;
 import com.arya_electric_auto.erp.entity.Product;
+import com.arya_electric_auto.erp.mapper.ProductMapper;
 import com.arya_electric_auto.erp.repository.ProductRepository;
 
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +24,10 @@ public class ProductController {
 
     // 🔥 GET ALL PRODUCTS
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAllProducts() {
+        return productRepository.findAll().stream()
+                .map(ProductMapper::toResponse)
+                .toList();
     }
 
     // 🔥 GET PRODUCT BY ID
@@ -33,7 +37,7 @@ public class ProductController {
         Optional<Product> optionalProduct = productRepository.findById(id);
 
         if (optionalProduct.isPresent()) {
-            return ResponseEntity.ok(optionalProduct.get());
+            return ResponseEntity.ok(ProductMapper.toResponse(optionalProduct.get()));
         } else {
             return ResponseEntity.badRequest().body("Product not found");
         }

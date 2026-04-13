@@ -1,9 +1,9 @@
 package com.arya_electric_auto.erp.service;
 
-
-
+import com.arya_electric_auto.erp.dto.EmployeeRequest;
 import com.arya_electric_auto.erp.dto.EmployeeResponse;
 import com.arya_electric_auto.erp.entity.Employee;
+import com.arya_electric_auto.erp.mapper.EmployeeMapper;
 import com.arya_electric_auto.erp.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +21,14 @@ public class EmployeeService {
     }
 
     // ✅ Create
-    public Employee create(Employee employee) {
+    public EmployeeResponse create(EmployeeRequest request) {
+        Employee employee = EmployeeMapper.toEntity(request);
 
         if (employee.getIsActive() == null) {
             employee.setIsActive(true);
         }
         employee.setCreatedAt(LocalDateTime.now());
-        return employeeRepository.save(employee);
+        return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 
     // ✅ Get All
@@ -51,18 +52,15 @@ public class EmployeeService {
     }
 
     // ✅ Update
-    public Employee update(Long id, Employee updated) {
+    public EmployeeResponse update(Long id, EmployeeRequest request) {
 
         Employee e = getEntityById(id);
 
-        e.setFullName(updated.getFullName());
-        e.setRole(updated.getRole());
-        e.setPhone(updated.getPhone());
-        e.setIsActive(updated.getIsActive());
+        EmployeeMapper.apply(request, e);
 
         e.setUpdatedAt(LocalDateTime.now());
 
-        return employeeRepository.save(e);
+        return EmployeeMapper.toResponse(employeeRepository.save(e));
     }
 
     // ✅ Deactivate (Soft delete alternative)
@@ -82,13 +80,6 @@ public class EmployeeService {
 
     // 
     public EmployeeResponse toResponse(Employee e) {
-        return new EmployeeResponse(
-                e.getId(),
-                e.getFullName(),
-                e.getRole().name(),
-                e.getPhone(),
-                e.getIsActive(),
-                e.getCreatedAt()
-        );
+        return EmployeeMapper.toResponse(e);
     }
 }

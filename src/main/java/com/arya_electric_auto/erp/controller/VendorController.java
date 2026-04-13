@@ -1,7 +1,7 @@
 package com.arya_electric_auto.erp.controller;
 
 import com.arya_electric_auto.erp.dto.VendorRequest;
-import com.arya_electric_auto.erp.entity.Vendor;
+import com.arya_electric_auto.erp.dto.VendorResponse;
 import com.arya_electric_auto.erp.service.VendorService;
 
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class VendorController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody VendorRequest request) {
         try {
-            Vendor vendor = vendorService.create(request);
+            VendorResponse vendor = vendorService.create(request);
             return ResponseEntity.ok(vendor);
         } catch (RuntimeException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -33,13 +33,13 @@ public class VendorController {
 
     // ✅ GET ALL
     @GetMapping
-    public List<Vendor> getAll() {
+    public List<VendorResponse> getAll() {
         return vendorService.getAll();
     }
 
     // ✅ GET BY ID
     @GetMapping("/{id}")
-    public Vendor getById(@PathVariable Long id) {
+    public VendorResponse getById(@PathVariable Long id) {
         return vendorService.getById(id);
     }
 
