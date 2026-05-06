@@ -2,11 +2,18 @@ package com.arya_electric_auto.erp.dto;
 
 import com.arya_electric_auto.erp.entity.InquirySource;
 
+import jakarta.validation.constraints.Pattern;
+
 import java.util.List;
 
 public class InquiryCreateRequest {
 
     private String name;
+    
+    @Pattern(
+    	    regexp = "^[6-9]\\d{9}$",
+    	    message = "Phone number must be valid 10 digit Indian mobile number"
+    	)
     private String phone;
     private String city;
     private String address;

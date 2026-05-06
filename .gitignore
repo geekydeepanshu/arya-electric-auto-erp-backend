@@ -1,33 +1,117 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+api-routes.txt
 
-### STS ###
-.apt_generated
+
+
+
+
+# ===============================
+# JAVA / SPRING BOOT
+# ===============================
+
+target/
+build/
+out/
+
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+logs/
+*.log
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# ===============================
+# MAVEN
+# ===============================
+
+.mvn/wrapper/maven-wrapper.jar
+
+# Maven local settings (optional)
+.settings/
+
+# ===============================
+# SPRING BOOT
+# ===============================
+
+application-local.properties
+application-prod.properties
+.env
+
+# ===============================
+# STS / ECLIPSE
+# ===============================
+
+.project
 .classpath
 .factorypath
-.project
-.settings
+
 .springBeans
-.sts4-cache
+.sts4-cache/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+.settings/
+.apt_generated/
+.apt_generated_tests/
+
+# Eclipse launch configs
+*.launch
+
+# ===============================
+# IntelliJ (if opened later)
+# ===============================
+
+.idea/
 *.iml
-*.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# ===============================
+# VS CODE
+# ===============================
 
-### VS Code ###
 .vscode/
+
+# ===============================
+# OS FILES
+# ===============================
+
+.DS_Store
+Thumbs.db
+
+# ===============================
+# TEMP FILES
+# ===============================
+
+*.tmp
+*.swp
+*~
+
+# ===============================
+# TEST / COVERAGE
+# ===============================
+
+coverage/
+jacoco.exec
+
+# ===============================
+# NODE (if frontend inside repo)
+# ===============================
+
+node_modules/
+dist/
+
+# ===============================
+# DOCKER
+# ===============================
+
+docker-compose.override.yml
+
+# ===============================
+# ENV / SECRETS
+# ===============================
+
+*.env
+.env.*
+secret.properties

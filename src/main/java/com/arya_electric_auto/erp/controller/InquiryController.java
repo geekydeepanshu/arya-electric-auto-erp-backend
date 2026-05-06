@@ -5,6 +5,9 @@ import com.arya_electric_auto.erp.dto.InquiryCreateRequest;
 import com.arya_electric_auto.erp.dto.InquiryResponse;
 import com.arya_electric_auto.erp.dto.InquiryStatusUpdateRequest;
 import com.arya_electric_auto.erp.service.InquiryService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +24,7 @@ public class InquiryController {
 
     // ✅ Create Inquiry
     @PostMapping
-    public InquiryResponse create(@RequestBody InquiryCreateRequest request) {
+    public InquiryResponse create(@Valid @RequestBody InquiryCreateRequest request) {
         return inquiryService.create(request);
     }
 
