@@ -1,7 +1,6 @@
 package com.arya_electric_auto.erp.controller;
 
-import com.arya_electric_auto.erp.entity.InventoryUnit;
-import com.arya_electric_auto.erp.entity.InventoryStock;
+
 import com.arya_electric_auto.erp.service.InventoryService;
 import com.arya_electric_auto.erp.dto.InventoryUnitResponse;
 import com.arya_electric_auto.erp.dto.InventoryStockResponse;

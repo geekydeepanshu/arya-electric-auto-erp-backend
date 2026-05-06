@@ -14,4 +14,6 @@ public interface JobCardRepository extends JpaRepository<JobCard, Long> {
     List<JobCard> findByStatusAndAssignedToId(String status, Long employeeId);
 
     List<JobCard> findByVehicleId(Long vehicleId);
+    
+    List<JobCard> findByAssetId(Long assetId);
 }

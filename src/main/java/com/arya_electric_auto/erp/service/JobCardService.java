@@ -1,42 +1,42 @@
 package com.arya_electric_auto.erp.service;
 
 import com.arya_electric_auto.erp.dto.service.JobCardRequest;
+import com.arya_electric_auto.erp.dto.service.JobCardResponse;
 import com.arya_electric_auto.erp.entity.*;
+import com.arya_electric_auto.erp.mapper.JobCardMapper;
 import com.arya_electric_auto.erp.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class JobCardService {
 
     private final JobCardRepository jobCardRepo;
-    private final PersonRepository personRepo;
-    private final CustomerVehicleRepository vehicleRepo;
+    private final CustomerAssetRepository assetRepo;
     private final EmployeeRepository employeeRepo;
     private final ServiceRequestRepository requestRepo;
+    private final JobCardComplaintRepository complaintRepo;
 
     public JobCardService(JobCardRepository jobCardRepo,
-                          PersonRepository personRepo,
-                          CustomerVehicleRepository vehicleRepo,
+                          CustomerAssetRepository assetRepo,
                           EmployeeRepository employeeRepo,
-                          ServiceRequestRepository requestRepo) {
+                          ServiceRequestRepository requestRepo,
+                          JobCardComplaintRepository complaintRepo) {
         this.jobCardRepo = jobCardRepo;
-        this.personRepo = personRepo;
-        this.vehicleRepo = vehicleRepo;
+        this.assetRepo = assetRepo;
         this.employeeRepo = employeeRepo;
         this.requestRepo = requestRepo;
+        this.complaintRepo = complaintRepo;
     }
 
     // 🔹 CREATE
-    public JobCard create(JobCardRequest req) {
+    public JobCardResponse create(JobCardRequest req) {
 
-        Person person = personRepo.findById(req.getPersonId())
-                .orElseThrow(() -> new RuntimeException("Person not found"));
-
-        CustomerVehicle vehicle = vehicleRepo.findById(req.getVehicleId())
-                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+        CustomerAsset asset = assetRepo.findById(req.getAssetId())
+                .orElseThrow(() -> new RuntimeException("Asset not found"));
 
         Employee emp = null;
         if (req.getAssignedTo() != null) {
@@ -45,14 +45,19 @@ public class JobCardService {
         }
 
         JobCard jc = new JobCard();
-        jc.setPerson(person);
-        jc.setVehicle(vehicle);
-        jc.setComplaint(req.getComplaint());
+        jc.setAsset(asset);
+        jc.setPerson(asset.getPerson()); // 🔥 derive
         jc.setAssignedTo(emp);
         jc.setStatus("OPEN");
         jc.setCreatedAt(LocalDateTime.now());
         jc.setUpdatedAt(LocalDateTime.now());
 
+        // optional summary
+        if (req.getComplaints() != null && !req.getComplaints().isEmpty()) {
+            jc.setComplaint(req.getComplaints().size() + " issues reported");
+        }
+
+        // 🔹 SERVICE REQUEST LINK
         if (req.getServiceRequestId() != null) {
             ServiceRequest sr = requestRepo.findById(req.getServiceRequestId())
                     .orElseThrow(() -> new RuntimeException("Request not found"));
@@ -62,43 +67,98 @@ public class JobCardService {
             requestRepo.save(sr);
         }
 
-        return jobCardRepo.save(jc);
+        JobCard saved = jobCardRepo.save(jc);
+
+        // 🔹 SAVE COMPLAINTS
+        if (req.getComplaints() != null) {
+            for (String c : req.getComplaints()) {
+
+                JobCardComplaint comp = new JobCardComplaint();
+                comp.setJobCard(saved);
+                comp.setDescription(c);
+                comp.setStatus("PENDING");
+
+                complaintRepo.save(comp);
+            }
+        }
+
+        return buildResponse(saved);
     }
 
     // 🔹 UPDATE STATUS
-    public JobCard updateStatus(Long id, String status) {
-        JobCard jc = getById(id);
+    public JobCardResponse updateStatus(Long id, String status) {
+        JobCard jc = getEntity(id);
         jc.setStatus(status);
         jc.setUpdatedAt(LocalDateTime.now());
-        return jobCardRepo.save(jc);
+        return buildResponse(jobCardRepo.save(jc));
     }
 
-    // 🔹 GET FILTERED LIST
-    public List<JobCard> getJobCards(String status, Long assignedTo) {
+    // 🔹 GET LIST
+    public List<JobCardResponse> getJobCards(String status, Long assignedTo) {
+
+        List<JobCard> list;
 
         if (status != null && assignedTo != null) {
-            return jobCardRepo.findByStatusAndAssignedToId(status, assignedTo);
+            list = jobCardRepo.findByStatusAndAssignedToId(status, assignedTo);
+        } else if (status != null) {
+            list = jobCardRepo.findByStatus(status);
+        } else if (assignedTo != null) {
+            list = jobCardRepo.findByAssignedToId(assignedTo);
+        } else {
+            list = jobCardRepo.findAll();
         }
 
-        if (status != null) {
-            return jobCardRepo.findByStatus(status);
+        List<JobCardResponse> res = new ArrayList<>();
+
+        for (JobCard jc : list) {
+            res.add(buildResponse(jc));
         }
 
-        if (assignedTo != null) {
-            return jobCardRepo.findByAssignedToId(assignedTo);
-        }
-
-        return jobCardRepo.findAll();
+        return res;
     }
 
     // 🔹 GET BY ID
-    public JobCard getById(Long id) {
+    public JobCardResponse getById(Long id) {
+        return buildResponse(getEntity(id));
+    }
+
+    // 🔹 GET BY ASSET
+    public List<JobCardResponse> getByAsset(Long assetId) {
+
+        List<JobCard> list = jobCardRepo.findByAssetId(assetId);
+
+        List<JobCardResponse> res = new ArrayList<>();
+
+        for (JobCard jc : list) {
+            res.add(buildResponse(jc));
+        }
+
+        return res;
+    }
+
+    // 🔹 INTERNAL ENTITY FETCH
+    private JobCard getEntity(Long id) {
+    	System.out.println("Job Card Id is"+id);
         return jobCardRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Job card not found"));
     }
 
-    // 🔹 GET BY VEHICLE
-    public List<JobCard> getByVehicle(Long vehicleId) {
-        return jobCardRepo.findByVehicleId(vehicleId);
+    // 🔹 BUILD RESPONSE (IMPORTANT)
+    private JobCardResponse buildResponse(JobCard jc) {
+
+        JobCardResponse res = JobCardMapper.toResponse(jc);
+
+        // 🔥 ADD COMPLAINTS
+        List<JobCardComplaint> complaints = complaintRepo.findByJobCardId(jc.getId());
+
+        List<String> list = new ArrayList<>();
+
+        for (JobCardComplaint c : complaints) {
+            list.add(c.getDescription());
+        }
+
+        res.setComplaints(list);
+
+        return res;
     }
 }

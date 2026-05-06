@@ -1,45 +1,96 @@
 package com.arya_electric_auto.erp.controller;
 
 import com.arya_electric_auto.erp.dto.ProductResponse;
-import com.arya_electric_auto.erp.entity.Product;
-import com.arya_electric_auto.erp.mapper.ProductMapper;
-import com.arya_electric_auto.erp.repository.ProductRepository;
+import com.arya_electric_auto.erp.entity.ProductRequest;
+import com.arya_electric_auto.erp.entity.ProductType;
+import com.arya_electric_auto.erp.service.ProductService;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
 @CrossOrigin
 public class ProductController {
 
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
-    // 🔥 GET ALL PRODUCTS
+    // =====================================================
+    // 🔹 CREATE PRODUCT
+    // =====================================================
+
+    @PostMapping
+    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
+
+        if (request.isSerialized == null) {
+            return ResponseEntity.badRequest().body("isSerialized is required");
+        }
+
+        return ResponseEntity.ok(productService.createProduct(request));
+    }
+
+    // =====================================================
+    // 🔹 GET ALL PRODUCTS
+    // =====================================================
+
     @GetMapping
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(ProductMapper::toResponse)
-                .toList();
+    public List<ProductResponse> getAllProducts(
+            @RequestParam(required = false) String type
+    ) {
+
+        if (type != null) {
+            return productService.getProductsByType(
+                    Enum.valueOf(ProductType.class, type)
+            );
+        }
+
+        return productService.getAllProducts();
     }
 
-    // 🔥 GET PRODUCT BY ID
+    // =====================================================
+    // 🔹 GET PRODUCT BY ID
+    // =====================================================
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
 
-        Optional<Product> optionalProduct = productRepository.findById(id);
+        try {
+            return ResponseEntity.ok(productService.getProductById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
-        if (optionalProduct.isPresent()) {
-            return ResponseEntity.ok(ProductMapper.toResponse(optionalProduct.get()));
-        } else {
-            return ResponseEntity.badRequest().body("Product not found");
+    // =====================================================
+    // 🔹 DELETE PRODUCT (SOFT DELETE)
+    // =====================================================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok("Product deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(
+            @PathVariable Long id,
+            @RequestBody ProductRequest request
+    ) {
+        try {
+            return ResponseEntity.ok(productService.updateProduct(id, request));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

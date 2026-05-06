@@ -19,11 +19,13 @@ public class JobCardMapper {
             res.setPersonName(jc.getPerson().getFullName());
         }
 
-        if (jc.getVehicle() != null) {
-            res.setVehicleName(jc.getVehicle().getVehicleName());
+        // 🔥 ASSET ONLY
+        if (jc.getAsset() != null) {
+            res.setAssetId(jc.getAsset().getId());
+            res.setAssetName(jc.getAsset().getDisplayName());
         }
 
-        res.setComplaint(jc.getComplaint());
+        
         res.setStatus(jc.getStatus());
 
         if (jc.getAssignedTo() != null) {

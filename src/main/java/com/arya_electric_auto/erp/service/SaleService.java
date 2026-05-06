@@ -130,7 +130,7 @@ public Long createSale(SaleRequest request) {
                     .findById(itemReq.getInventoryUnitId())
                     .orElseThrow(() -> new RuntimeException("Inventory unit not found"));
 
-            if (!"AVAILABLE".equals(unit.getStatus())) {
+            if (InventoryStatus.IN_STOCK != unit.getStatus()) {
                 throw new RuntimeException("Item already sold/reserved: " + unit.getSerialNumber());
             }
 

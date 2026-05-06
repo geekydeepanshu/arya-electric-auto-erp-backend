@@ -18,8 +18,8 @@ public class InquiryModel {
 
     // 🔗 model
     @ManyToOne
-    @JoinColumn(name = "model_id", nullable = false)
-    private VehicleModel model;
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     private LocalDateTime createdAt;
 
@@ -27,7 +27,7 @@ public class InquiryModel {
 
     // setters
     public void setInquiry(Inquiry inquiry) { this.inquiry = inquiry; }
-    public void setModel(VehicleModel model) { this.model = model; }
+    
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
 	public Long getId() {
@@ -42,12 +42,18 @@ public class InquiryModel {
 		return inquiry;
 	}
 
-	public VehicleModel getModel() {
-		return model;
-	}
+	
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
 	}
     
     

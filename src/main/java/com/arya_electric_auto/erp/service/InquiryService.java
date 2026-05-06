@@ -5,14 +5,18 @@ import com.arya_electric_auto.erp.dto.InquiryResponse;
 import com.arya_electric_auto.erp.entity.*;
 import com.arya_electric_auto.erp.mapper.InquiryMapper;
 import com.arya_electric_auto.erp.repository.InquiryRepository;
-import com.arya_electric_auto.erp.repository.VehicleModelRepository;
+
 import com.arya_electric_auto.erp.repository.EmployeeRepository;
 import com.arya_electric_auto.erp.repository.InquiryModelRepository;
+import com.arya_electric_auto.erp.repository.ProductRepository;
+import com.arya_electric_auto.erp.entity.Product;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class InquiryService {
@@ -21,18 +25,19 @@ public class InquiryService {
     private final PersonService personService;
     private final EmployeeRepository employeeRepository;
     private final InquiryModelRepository inquiryModelRepository;
-    private final VehicleModelRepository vehicleModelRepository;
+    private final ProductRepository productRepository;
+    private static final Logger log = LoggerFactory.getLogger(InquiryService.class);
 
     public InquiryService(InquiryRepository inquiryRepository,
                           PersonService personService,
                           EmployeeRepository employeeRepository,
                           InquiryModelRepository inquiryModelRepository,
-                          VehicleModelRepository vehicleModelRepository) {
+                          ProductRepository productRepository) {
         this.inquiryRepository = inquiryRepository;
         this.personService = personService;
         this.employeeRepository = employeeRepository;
         this.inquiryModelRepository = inquiryModelRepository;
-        this.vehicleModelRepository = vehicleModelRepository;
+        this.productRepository = productRepository;
     }
 
     // ✅ Create Inquiry
@@ -44,6 +49,9 @@ public class InquiryService {
                 request.getCity(),
                 request.getAddress()
         );
+    	
+    	log.info("Creating inquiry | name={} | phone={} | source={} ",
+    			request.getName(),request.getPhone(), request.getSource());
 
     	Inquiry inquiry = new Inquiry();
     	inquiry.setPerson(person);
@@ -53,22 +61,24 @@ public class InquiryService {
     	inquiry.setInquiryDate(LocalDateTime.now());
     	inquiry.setNotes(request.getNotes());
     	inquiry.setCreatedAt(LocalDateTime.now());
+    	
+    	log.info("Inquiry created | inquiryId={}", inquiry.getId());
 
 	// ✅ Save inquiry first
     	Inquiry savedInquiry = inquiryRepository.save(inquiry);
 
 	// ✅ NEW: Save models (IMPORTANT)
-    	for (Long modelId : request.getModelIds()) {
+    	for (Long productId : request.getModelIds()) {
 
-    		VehicleModel model = vehicleModelRepository.findById(modelId)
-    				.orElseThrow(() -> new RuntimeException("Model not found"));
+    	    Product product = productRepository.findById(productId)
+    	            .orElseThrow(() -> new RuntimeException("Product not found for ID: " + productId));
 
-    		InquiryModel im = new InquiryModel();
-    		im.setInquiry(savedInquiry);
-    		im.setModel(model);
-    		im.setCreatedAt(LocalDateTime.now());
+    	    InquiryModel im = new InquiryModel();
+    	    im.setInquiry(savedInquiry);
+    	    im.setProduct(product);
+    	    im.setCreatedAt(LocalDateTime.now());
 
-    		inquiryModelRepository.save(im);
+    	    inquiryModelRepository.save(im);
     	}
 
     	return toResponse(savedInquiry);
@@ -76,6 +86,7 @@ public class InquiryService {
 
     // ✅ Get all
     public List<Inquiry> getAll() {
+    	 log.debug("Fetching all inquiries");
         return inquiryRepository.findByDeletedAtIsNull();
     }
 
@@ -127,7 +138,7 @@ public class InquiryService {
 
         return inquiryModelRepository.findByInquiryId(inquiryId)
                 .stream()
-                .map(im -> im.getModel().getName())
+                .map(im -> im.getProduct().getName())
                 .toList();
     }
     

@@ -55,6 +55,7 @@ public class InquiryController {
     }
 
     // ✅ Soft delete
+    
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         inquiryService.delete(id);

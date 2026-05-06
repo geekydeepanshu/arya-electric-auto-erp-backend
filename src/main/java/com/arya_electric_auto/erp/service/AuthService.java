@@ -5,6 +5,7 @@ import com.arya_electric_auto.erp.dto.LoginResponse;
 import com.arya_electric_auto.erp.entity.Employee;
 import com.arya_electric_auto.erp.entity.User;
 import com.arya_electric_auto.erp.repository.UserRepository;
+import com.arya_electric_auto.erp.security.JwtUtil;
 import com.arya_electric_auto.erp.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +14,13 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
+    private final JwtUtil jwtUtil;
 
     public AuthService(UserRepository userRepository,
-                       EmployeeRepository employeeRepository) {
+                       EmployeeRepository employeeRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.employeeRepository = employeeRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -36,12 +39,20 @@ public class AuthService {
 
         Employee emp = user.getEmployee();
 
+        // 🔥 GENERATE TOKEN
+        String token = jwtUtil.generateToken(
+                user.getUsername(),
+                user.getRole().name()
+        );
+
         return new LoginResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getRole().name(),
                 emp.getId(),
-                emp.getFullName()
+                emp.getFullName(),
+                token   // ✅ NEW
         );
     }
+   
 }

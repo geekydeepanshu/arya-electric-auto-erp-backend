@@ -16,12 +16,16 @@ public class JobCard {
     private Person person;
 
     @ManyToOne
-    @JoinColumn(name = "vehicle_id", nullable = false)
+    @JoinColumn(name = "vehicle_id", nullable = true)
     private CustomerVehicle vehicle;
 
     @ManyToOne
     @JoinColumn(name = "service_request_id")
     private ServiceRequest serviceRequest;
+    
+    @ManyToOne
+    @JoinColumn(name = "asset_id")
+    private CustomerAsset asset;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String complaint;
@@ -67,4 +71,14 @@ public class JobCard {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+	public CustomerAsset getAsset() {
+		return asset;
+	}
+
+	public void setAsset(CustomerAsset asset) {
+		this.asset = asset;
+	}
+    
+    
 }

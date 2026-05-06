@@ -5,6 +5,9 @@ import com.arya_electric_auto.erp.dto.FollowUpResponse;
 import com.arya_electric_auto.erp.entity.*;
 import com.arya_electric_auto.erp.repository.FollowUpRepository;
 import com.arya_electric_auto.erp.repository.EmployeeRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +21,7 @@ public class FollowUpService {
     private final FollowUpRepository followUpRepository;
     private final InquiryService inquiryService;
     private final EmployeeRepository employeeRepository;
+    private static final Logger log = LoggerFactory.getLogger(InquiryService.class);
 
     public FollowUpService(FollowUpRepository followUpRepository,
                            InquiryService inquiryService,
@@ -36,7 +40,8 @@ public class FollowUpService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
                 */
-
+        log.info("Adding follow-up | inquiryId={} | note={}", request.getInquiryId(), request.getNotes());
+        
         FollowUp followUp = new FollowUp();
         followUp.setInquiry(inquiry);
         followUp.setEmployeeId(request.getEmployeeId());
