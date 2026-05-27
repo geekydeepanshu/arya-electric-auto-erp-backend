@@ -5,11 +5,14 @@ import com.arya_electric_auto.erp.security.JwtFilter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import org.springframework.http.HttpMethod;
+
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 
 @EnableMethodSecurity
 @Configuration
@@ -18,23 +21,47 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final RequestLoggingFilter requestLoggingFilter;
 
-    public SecurityConfig(JwtFilter jwtFilter, RequestLoggingFilter requestLoggingFilter) {
+    public SecurityConfig(
+            JwtFilter jwtFilter,
+            RequestLoggingFilter requestLoggingFilter) {
+
         this.jwtFilter = jwtFilter;
         this.requestLoggingFilter = requestLoggingFilter;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http) throws Exception {
 
         http
+            .cors(Customizer.withDefaults())   // ADD THIS
             .csrf(csrf -> csrf.disable())
+
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**").permitAll()
-                    .anyRequest().authenticated()
+
+                // allow browser preflight
+                .requestMatchers(
+                        HttpMethod.OPTIONS,
+                        "/**"
+                ).permitAll()
+
+                // public auth APIs
+                .requestMatchers(
+                        "/api/auth/**"
+                ).permitAll()
+
+                .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        	.addFilterAfter(requestLoggingFilter, JwtFilter.class);
-        
+
+            .addFilterBefore(
+                    jwtFilter,
+                    UsernamePasswordAuthenticationFilter.class
+            )
+
+            .addFilterAfter(
+                    requestLoggingFilter,
+                    JwtFilter.class
+            );
 
         return http.build();
     }
