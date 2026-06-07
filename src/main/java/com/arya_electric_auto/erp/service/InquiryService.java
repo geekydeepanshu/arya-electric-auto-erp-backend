@@ -13,7 +13,7 @@ import com.arya_electric_auto.erp.entity.Product;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +58,9 @@ public class InquiryService {
     	inquiry.setSource(request.getSource());
     	inquiry.setNotes(request.getNotes());
     	inquiry.setStatus(InquiryStatus.NEW);
-    	inquiry.setInquiryDate(LocalDateTime.now());
+    	inquiry.setInquiryDate(Instant.now());
     	inquiry.setNotes(request.getNotes());
-    	inquiry.setCreatedAt(LocalDateTime.now());
+    	inquiry.setCreatedAt(Instant.now());
     	
     	log.info("Inquiry created | inquiryId={}", inquiry.getId());
 
@@ -76,7 +76,7 @@ public class InquiryService {
     	    InquiryModel im = new InquiryModel();
     	    im.setInquiry(savedInquiry);
     	    im.setProduct(product);
-    	    im.setCreatedAt(LocalDateTime.now());
+    	    im.setCreatedAt(Instant.now());
 
     	    inquiryModelRepository.save(im);
     	}
@@ -109,7 +109,7 @@ public class InquiryService {
     public InquiryResponse updateStatus(Long id, InquiryStatus status) {
         Inquiry inquiry = getEntityById(id);
         inquiry.setStatus(status);
-        inquiry.setUpdatedAt(LocalDateTime.now());
+        inquiry.setUpdatedAt(Instant.now());
         return toResponse(inquiryRepository.save(inquiry));
     }
 
@@ -129,7 +129,7 @@ public class InquiryService {
     // ✅ Soft delete
     public void delete(Long id) {
         Inquiry inquiry = getEntityById(id);
-        inquiry.setDeletedAt(LocalDateTime.now());
+        inquiry.setDeletedAt(Instant.now());
         inquiryRepository.save(inquiry);
     }
     

@@ -1,7 +1,8 @@
 package com.arya_electric_auto.erp.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import java.time.Instant;
 
 @Entity
 @Table(name = "inquiry_models")
@@ -21,14 +22,14 @@ public class InquiryModel {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     public InquiryModel() {}
 
     // setters
     public void setInquiry(Inquiry inquiry) { this.inquiry = inquiry; }
     
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
 	public Long getId() {
 		return id;
@@ -44,7 +45,7 @@ public class InquiryModel {
 
 	
 
-	public LocalDateTime getCreatedAt() {
+	public Instant getCreatedAt() {
 		return createdAt;
 	}
 

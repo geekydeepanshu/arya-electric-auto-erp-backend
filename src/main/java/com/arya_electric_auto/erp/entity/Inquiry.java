@@ -2,7 +2,8 @@ package com.arya_electric_auto.erp.entity;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+
 
 @Entity
 @Table(name = "inquiries")
@@ -22,7 +23,7 @@ public class Inquiry {
     @Enumerated(EnumType.STRING)
     private InquirySource source;
 
-    private LocalDateTime inquiryDate;
+    private Instant inquiryDate;
 
     // NEW / FOLLOW_UP / CONVERTED etc.
     @Enumerated(EnumType.STRING)
@@ -35,9 +36,9 @@ public class Inquiry {
 
     private String notes;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
+    private  Instant createdAt;
+    private Instant updatedAt;
+    private Instant deletedAt;
 	public Long getId() {
 		return id;
 	}
@@ -56,10 +57,10 @@ public class Inquiry {
 	public void setSource(InquirySource source) {
 		this.source = source;
 	}
-	public LocalDateTime getInquiryDate() {
+	public Instant getInquiryDate() {
 		return inquiryDate;
 	}
-	public void setInquiryDate(LocalDateTime inquiryDate) {
+	public void setInquiryDate(Instant inquiryDate) {
 		this.inquiryDate = inquiryDate;
 	}
 	public InquiryStatus getStatus() {
@@ -80,22 +81,22 @@ public class Inquiry {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-	public LocalDateTime getCreatedAt() {
+	public Instant getCreatedAt() {
 		return createdAt;
 	}
-	public void setCreatedAt(LocalDateTime createdAt) {
+	public void setCreatedAt(Instant createdAt) {
 		this.createdAt = createdAt;
 	}
-	public LocalDateTime getUpdatedAt() {
+	public Instant getUpdatedAt() {
 		return updatedAt;
 	}
-	public void setUpdatedAt(LocalDateTime updatedAt) {
+	public void setUpdatedAt(Instant updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-	public LocalDateTime getDeletedAt() {
+	public Instant getDeletedAt() {
 		return deletedAt;
 	}
-	public void setDeletedAt(LocalDateTime deletedAt) {
+	public void setDeletedAt(Instant deletedAt) {
 		this.deletedAt = deletedAt;
 	}
     

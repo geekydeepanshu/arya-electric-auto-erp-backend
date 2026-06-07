@@ -1,5 +1,6 @@
 package com.arya_electric_auto.erp.dto;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,14 +13,14 @@ public class InquiryResponse {
     private String city;
     private String source;
     private String status;
-    private LocalDateTime inquiryDate;
+    private Instant inquiryDate;
 
     // ✅ important
     private List<String> models;
 
     public InquiryResponse(Long id, String name, String phone,String address, String city,
                            String source, String status,
-                           LocalDateTime inquiryDate,
+                           Instant inquiryDate,
                            List<String> models) {
         this.id = id;
         this.name = name;
@@ -84,11 +85,11 @@ public class InquiryResponse {
 		this.status = status;
 	}
 
-	public LocalDateTime getInquiryDate() {
+	public Instant getInquiryDate() {
 		return inquiryDate;
 	}
 
-	public void setInquiryDate(LocalDateTime inquiryDate) {
+	public void setInquiryDate(Instant inquiryDate) {
 		this.inquiryDate = inquiryDate;
 	}
 
